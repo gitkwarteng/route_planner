@@ -1,7 +1,7 @@
 from typing import Optional
 
 from common.client import BaseRequestClient
-from .types import Coordinate, RouteData
+from .data import Coordinate, RouteData
 
 
 class RoutingClient(BaseRequestClient):

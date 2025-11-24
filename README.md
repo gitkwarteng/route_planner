@@ -5,7 +5,7 @@ Django API that calculates optimal fuel stops along a route based on fuel prices
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+pip install -r base.txt
 python manage.py migrate
 python manage.py load_stations
 python manage.py runserver

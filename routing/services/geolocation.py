@@ -1,6 +1,6 @@
 import enum
 
-from routing.types import Coordinate
+from routing.data import Coordinate
 
 
 class LocationServiceType(enum.IntEnum):

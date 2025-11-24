@@ -12,6 +12,7 @@ class Command(BaseCommand):
         parser.add_argument(
             'file',
             type=str,
+            nargs='?',
             default='data/fuel-stations.csv',
             help='Path to CSV file with fuel station data'
         )
@@ -30,21 +31,31 @@ class Command(BaseCommand):
         FuelStation.objects.all().delete()
         stations = []
 
+        processed = 0
+
         with open(csv_path, 'r') as f:
             reader = csv.DictReader(f)
             for row in reader:
+                processed += 1
                 try:
-                    location = f"{row['City']}, {row['State']}, USA"
+                    city = row['City'].strip()
+                    state = row['State']
+                    location = f"{city}, {state}, USA"
+                    self.stdout.write(
+                            f'{processed}. Processing station: {row["Truckstop Name"]} ({location})'
+                    )
                     result = geocoder.geocode(location)
 
                     if result:
                         from django.contrib.gis.geos import Point
+                        name = row['Truckstop Name'].strip()
+                        address = row['Address']
                         stations.append(FuelStation(
                             opis_id=row['OPIS Truckstop ID'],
-                            name=row['Truckstop Name'],
-                            address=row['Address'],
-                            city=row['City'],
-                            state=row['State'],
+                            name=name,
+                            address=address,
+                            city=city,
+                            state=state,
                             rack_id=row['Rack ID'],
                             price=float(row['Retail Price']),
                             location=Point(result.longitude, result.latitude)
@@ -52,10 +63,11 @@ class Command(BaseCommand):
                     else:
                         self.stdout.write(self.style.WARNING(f"Failed to geocode: {location}"))
 
-                        if len(stations) >= 100:
-                            FuelStation.objects.bulk_create(stations)
-                            self.stdout.write(f'Loaded {FuelStation.objects.count()} stations...')
-                            stations = []
+                    if len(stations) >= 100:
+                        FuelStation.objects.bulk_create(stations)
+                        self.stdout.write(f'Loaded {FuelStation.objects.count()} stations...')
+                        stations = []
+
                 except Exception as e:
                     self.stdout.write(self.style.ERROR(f"Error parsing: {location}. {e}"))
                     time.sleep(1)

@@ -2,7 +2,7 @@ import logging
 from typing import List, Dict
 
 from .station import StationService
-from routing.types import SamplePoint, FuelStation, OptimizedRouteResult
+from routing.data import SamplePoint, FuelStation, OptimizedRouteResult
 
 logger = logging.getLogger('routing.route')
 

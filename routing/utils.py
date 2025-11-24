@@ -1,6 +1,6 @@
 from typing import List
 
-from routing.types import Coordinate, FuelStation, RouteData
+from routing.data import Coordinate, FuelStation, RouteData
 
 
 def generate_map_url(start:Coordinate, end:Coordinate, fuel_stops:List[FuelStation]):
@@ -29,7 +29,7 @@ def make_response(*, route:RouteData, fuel_stops:List[FuelStation], total_cost:f
     return {
         'route': route.geometry,
         'total_distance': route.distance,
-        'stops': fuel_stops,
+        'stops': [stop.as_dict for stop in fuel_stops],
         'total_cost': total_cost,
         'total_gallons': total_gallons,
         'map': generate_map_url(route.start, route.finish, fuel_stops),

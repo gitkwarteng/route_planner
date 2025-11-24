@@ -1,7 +1,7 @@
 from django.contrib.gis.db import models
 
 class FuelStation(models.Model):
-    opis_id = models.CharField(max_length=50, unique=True)
+    opis_id = models.CharField(max_length=50)
     name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     city = models.CharField(max_length=100)

@@ -76,3 +76,20 @@ class FuelStation:
     gallons: Optional[float] = None
     cost: Optional[float] = None
     distance_from_route: Optional[float] = None
+
+    @property
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'address': self.address,
+            'city': self.city,
+            'state': self.state,
+            'price': self.price,
+            'location': self.location,
+            'distance_from_point': self.distance_from_point,
+            'distance_from_start': self.distance_from_start,
+            'gallons': self.gallons,
+            'cost': self.cost,
+            'distance_from_route': self.distance_from_route
+        }

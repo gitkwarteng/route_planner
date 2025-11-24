@@ -1,0 +1,3 @@
+-r base.txt
+
+django_settings @ git+https://github.com/gitkwarteng/django-settings-class.git@0.2.16

@@ -5,7 +5,7 @@ from django.contrib.gis.db.models.functions import Distance
 from geopy.distance import geodesic
 
 from routing.models import FuelStation
-from routing.types import Coordinate, FuelStation, SamplePoint
+from routing.data import Coordinate, FuelStation, SamplePoint
 
 
 class StationService:
