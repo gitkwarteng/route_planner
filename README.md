@@ -62,6 +62,8 @@ curl -X POST http://localhost:8000/api/route/ \
 
 ```json
 {
+  "start": {"lat": 5.99393, "lon": -5.7337, "name": "Los Angeles, CA"},
+  "finish": {"lat": 4.89393, "lon": -3.7337, "name": "Phoenix, AZ"},
   "route": [[lon, lat], ...],
   "total_distance": 372.5,
   "stops": [
@@ -76,9 +78,15 @@ curl -X POST http://localhost:8000/api/route/ \
   ],
   "total_fuel_cost": 145.23,
   "total_gallons": 37.25,
-  "map": "https://www.openstreetmap.org/?mlat=36.7425836&mlon=-101.26182965#map=6/37.86/-102.66",
+  "map_url": "https://www.openstreetmap.org/?mlat=36.7425836&mlon=-101.26182965#map=6/37.86/-102.66",
+  "map": "PCFET0NUWVBFIGh0bWw+IDxodG1sIGxhbmc9ImVuIj4gPGhlYWQ+IDxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4gPG1ldGEgbmFtZT0idmlld3Bvcn==", 
   "message": "successful"
 }
+```
+
+* The `map` key is a base64 encoded html. It an be converted back to html in Javascript with 
+```js
+    const html = atob(response.map);
 ```
 
 ## Features
@@ -90,6 +98,7 @@ curl -X POST http://localhost:8000/api/route/ \
 - Fast response times with database indexing
 - Handles 8000+ fuel stations efficiently
 - One-time geocoding via management command and fixtures
+- Caching for fast repeated search.
 
 ## Loading Fuel Stations
 

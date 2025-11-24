@@ -1,4 +1,6 @@
 import logging
+import hashlib
+from django.core.cache import cache
 from rest_framework.exceptions import ValidationError
 from rest_framework.viewsets import ViewSet
 from rest_framework.decorators import action
@@ -11,6 +13,7 @@ from routing.services.route import RouteService
 from .services.geolocation import GeoLocationService
 from .services.station import StationService
 from routing.utils.route import make_response
+from routing.data import SamplePoint
 
 logger = logging.getLogger(__name__)
 
@@ -52,10 +55,17 @@ class RouteViewSet(ViewSet):
             if not route:
                 return Response({'error': 'No route found'}, status=status.HTTP_404_NOT_FOUND)
 
-            # Get sample stop points
-            route_points = StationService.get_sample_points_along_route(
-                with_coordinates=route.coordinates
-            )
+            # Get sample stop points with caching
+            cache_key = f"route_points:{hashlib.md5(f'{start}:{finish}'.encode()).hexdigest()}"
+            route_points = cache.get(cache_key)
+            
+            if not route_points:
+                route_points = StationService.get_sample_points_along_route(
+                    with_coordinates=route.coordinates
+                )
+                cache.set(cache_key, [p.__dict__ for p in route_points], timeout=3600)
+            else:
+                route_points = [SamplePoint(**p) for p in route_points]
 
             route_service = RouteService()
             result = route_service.get_optimized_stops_for_route(
@@ -63,13 +73,18 @@ class RouteViewSet(ViewSet):
                 total_distance=route.distance
             )
             logger.info(f"Route planned successfully: {route.distance} miles")
-            return Response(make_response(
-                route=route,
-                fuel_stops=result.stops,
-                total_cost=result.cost,
-                total_gallons=result.gallons,
-                message="Successful"
-            ))
+
+            response = make_response(
+                route=route, fuel_stops=result.stops, total_cost=result.cost,
+                                     total_gallons=result.gallons, message="Successful"
+            )
+            response.update({
+                'start': {'lat': start_location.latitude, 'lon': start_location.longitude, 'name': start},
+                'finish': {'lat': finish_location.latitude, 'lon': finish_location.longitude, 'name': finish},
+            })
+
+            return Response(response)
+
         except ValidationError as e:
             logger.warning(f"Validation error: {e.detail}")
             return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)

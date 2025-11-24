@@ -62,8 +62,8 @@ class StationService:
 
         # Add ending point
         points.append(SamplePoint(
-            latitude=with_coordinates[-1][1],
-            longitude=with_coordinates[-1][0],
+            latitude=with_coordinates[-1].latitude,
+            longitude=with_coordinates[-1].longitude,
             distance_from_start=cumulative_distance
         ))
 

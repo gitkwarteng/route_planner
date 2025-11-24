@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Route Map</title>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            #map {
+                height: 100vh;
+                width: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+        <script>
+            let map = L.map('map');
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            let routeLine = L.polyline({{ route_coords|safe }}, {
+                color: '#3b82f6',
+                weight: 4,
+                opacity: 0.7
+            }).addTo(map);
+
+            L.marker([{{ route.start.latitude }}, {{ route.start.longitude }}], {
+                icon: L.divIcon({
+                    className: 'start-marker',
+                    html: '<div style="background: #10b981; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">🏁</div>',
+                    iconSize: [40, 40]
+                })
+            }).addTo(map)
+                .bindPopup('<strong>Start:</strong> {{ route.start.name }}');
+
+            {% for stop in stops %}
+                L.marker([{{ stop.latitude }}, {{ stop.longitude }}], {
+                    icon: L.divIcon({
+                        className: 'fuel-marker',
+                        html: '<div style="background: #3b82f6; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">{{ forloop.counter }}</div>',
+                        iconSize: [30, 30]
+                    })
+                }).addTo(map)
+                    .bindPopup(`
+                    <div style="min-width: 200px;">
+                        <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: bold;">{{ stop.name }}</h3>
+                        <p style="margin: 4px 0; font-size: 12px; color: #666;">{{ stop.city }}, {{ stop.state }}</p>
+                        <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">
+                        <p style="margin: 4px 0; font-size: 13px;"><strong>Price:</strong> ${{ stop.price|floatformat:3 }}/gal</p>
+                        <p style="margin: 4px 0; font-size: 13px;"><strong>Purchase:</strong> {{ stop.gallons|floatformat:1 }} gal</p>
+                        <p style="margin: 4px 0; font-size: 13px; color: #059669;"><strong>Cost:</strong> ${{ stop.cost|floatformat:2 }}</p>
+                        <p style="margin: 4px 0; font-size: 12px; color: #666;">Mile {{ stop.distance_from_start|floatformat:0 }}</p>
+                    </div>
+                `);
+            {% endfor %}
+
+            L.marker([{{ route.finish.latitude }}, {{ route.finish.longitude }}], {
+                icon: L.divIcon({
+                    className: 'end-marker',
+                    html: '<div style="background: #ef4444; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">🎯</div>',
+                    iconSize: [40, 40]
+                })
+            }).addTo(map)
+                .bindPopup('<strong>Destination:</strong> {{ route.end.name }}');
+
+            map.fitBounds(routeLine.getBounds(), {padding: [50, 50]});
+        </script>
+    </body>
+</html>
