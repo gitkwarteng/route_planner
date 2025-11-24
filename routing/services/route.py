@@ -2,7 +2,7 @@ import logging
 from typing import List, Dict
 
 from .station import StationService
-from routing.data import SamplePoint, FuelStation, OptimizedRouteResult
+from routing.data import SamplePoint, FuelStop, OptimizedRouteResult
 
 logger = logging.getLogger('routing.route')
 
@@ -104,12 +104,12 @@ class RouteService:
 
 
     def _calculate_optimal_gallons(
-            self, *,
-            current_stop: FuelStation,
-            stops_by_segment: Dict[int, List[FuelStation]],
-            current_distance: float,
-            current_fuel_miles: float,
-            total_distance: float
+        self, *,
+        current_stop: FuelStop,
+        stops_by_segment: Dict[int, List[FuelStop]],
+        current_distance: float,
+        current_fuel_miles: float,
+        total_distance: float
     ) -> float:
         """
         Calculate optimal gallons to purchase at current stop.

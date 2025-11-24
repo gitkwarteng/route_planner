@@ -1,6 +1,7 @@
 import logging
 from rest_framework.exceptions import ValidationError
-from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -9,17 +10,27 @@ from .serializers import RouteRequestSerializer
 from routing.services.route import RouteService
 from .services.geolocation import GeoLocationService
 from .services.station import StationService
-from .utils import make_response
+from routing.utils.route import make_response
 
 logger = logging.getLogger(__name__)
 
 
-class RouteView(APIView):
+class RouteViewSet(ViewSet):
     serializer_class = RouteRequestSerializer
 
-    def get(self, request):
-        logger.info(f"GET request from {request.META.get('REMOTE_ADDR')}")
-        serializer = self.serializer_class(data=request.data)
+    def list(self, request):
+        return Response({
+            'message': 'Route Planning API',
+            'endpoints': {
+                'plan': '/api/route/plan/ - Plan a route with fuel stops (GET/POST)'
+            }
+        })
+
+    @action(detail=False, methods=['get', 'post'])
+    def plan(self, request):
+        logger.info(f"{request.method} request from {request.META.get('REMOTE_ADDR')}")
+        data = request.query_params if request.method == 'GET' else request.data
+        serializer = self.serializer_class(data=data)
         try:
             serializer.is_valid(raise_exception=True)
             start = serializer.validated_data['start']
@@ -66,6 +77,3 @@ class RouteView(APIView):
         except Exception as e:
             logger.error(f"Error planning route: {str(e)}", exc_info=True)
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-    def post(self, request):
-        return self.get(request)

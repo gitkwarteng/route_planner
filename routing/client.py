@@ -1,5 +1,6 @@
+import hashlib
 from typing import Optional
-
+from django.core.cache import cache
 from common.client import BaseRequestClient
 from .data import Coordinate, RouteData
 
@@ -17,6 +18,11 @@ class RoutingClient(BaseRequestClient):
         :return: Returns a route data if route was found, else None.
         """
         coords = f"{from_location.__str__()};{to_location.__str__()}"
+        cache_key = f"route:{hashlib.md5(coords.encode()).hexdigest()}"
+        
+        cached = cache.get(cache_key)
+        if cached:
+            return RouteData(**cached)
 
         endpoint = f'driving/{coords}'
 
@@ -30,7 +36,7 @@ class RoutingClient(BaseRequestClient):
 
         if response.get('code') == 'Ok' and response.get('routes'):
             route = response['routes'][0]
-            return RouteData(
+            route_data = RouteData(
                 distance=route['distance'] / 1609.34,  # Convert to miles
                 duration=route['duration'] / 60,  # Convert to minutes
                 geometry=route['geometry'],
@@ -38,5 +44,8 @@ class RoutingClient(BaseRequestClient):
                 start=from_location,
                 finish=to_location
             )
+            
+            cache.set(cache_key, route_data.__dict__, timeout=3600)
+            return route_data
 
         return None

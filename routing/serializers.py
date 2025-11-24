@@ -1,8 +1,22 @@
 from rest_framework import serializers
 
+from routing.utils.validation import is_valid_us_address
+
+
 class RouteRequestSerializer(serializers.Serializer):
     start = serializers.CharField(required=True)
     finish = serializers.CharField(required=True)
+    
+    def validate_start(self, value):
+        if not is_valid_us_address(value):
+            raise serializers.ValidationError("Address must be in format 'City, State' or 'City, State, USA' within the United States")
+        return value
+    
+    def validate_finish(self, value):
+        if not is_valid_us_address(value):
+            raise serializers.ValidationError("Address must be in format 'City, State' or 'City, State, USA' within the United States")
+        return value
+
 
 
 class FuelStopSerializer(serializers.Serializer):

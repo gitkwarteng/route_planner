@@ -13,7 +13,7 @@ python manage.py runserver
 
 ## API Endpoint
 
-**URL:** `http://localhost:8000/api/plan-route/`
+**URL:** `http://localhost:8000/api/route/`
 
 **Methods:** GET or POST
 
@@ -25,12 +25,12 @@ python manage.py runserver
 
 ### GET Request
 ```bash
-curl "http://localhost:8000/api/plan-route/?start=Los%20Angeles,%20CA&end=Phoenix,%20AZ"
+curl "http://localhost:8000/api/route/?start=Los%20Angeles,%20CA&end=Phoenix,%20AZ"
 ```
 
 ### POST Request
 ```bash
-curl -X POST http://localhost:8000/api/plan-route/ \
+curl -X POST http://localhost:8000/api/route/ \
   -H "Content-Type: application/json" \
   -d '{"start": "Los Angeles, CA", "end": "Phoenix, AZ"}'
 ```

@@ -1,6 +1,10 @@
-from django.urls import path
-from .views import RouteView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import RouteViewSet
+
+router = DefaultRouter()
+router.register(r'route', RouteViewSet, basename='route')
 
 urlpatterns = [
-    path('plan-route/', RouteView.as_view(), name='plan_route'),
+    path('', include(router.urls)),
 ]

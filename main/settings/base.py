@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 from django_settings.settings import DjangoSettings, DatabaseConfig, DjangoDatabases
 
@@ -22,12 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 class DatabasesSettings(DjangoDatabases):
     default = DatabaseConfig(**{
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'route_planner',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'engine': 'django.contrib.gis.db.backends.postgis',
+        'name': os.getenv('DB_NAME', 'route_planner'),
+        'user': os.getenv('DB_USER', 'postgres'),
+        'password': os.getenv('DB_PASSWORD', 'postgres'),
+        'host': os.getenv('DB_HOST', 'localhost'),
+        'port': os.getenv('DB_PORT', '5432'),
     })
     sqllite = DatabaseConfig(**{
         'engine': 'django.db.backends.sqlite3',
@@ -66,4 +67,16 @@ djsettings.rest_framework = {
         'rest_framework.renderers.MultiPartRenderer',
         'rest_framework.renderers.JSONRenderer',
     ]
+}
+
+djsettings.caches = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1'),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+        'KEY_PREFIX': 'route_planner',
+        'TIMEOUT': 3600,  # 1 hour default
+    }
 }

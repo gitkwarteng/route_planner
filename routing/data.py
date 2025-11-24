@@ -55,13 +55,13 @@ class RouteData:
 
 @dataclasses.dataclass(frozen=True)
 class OptimizedRouteResult:
-    stops: List['FuelStation']
+    stops: List['FuelStop']
     cost: float
     gallons: float
 
 
 @dataclasses.dataclass
-class FuelStation:
+class FuelStop:
     id: str
     name: str
     address: str
@@ -69,13 +69,18 @@ class FuelStation:
     state: str
     price: float
     location: str
-    coords: Coordinate
+    latitude: float
+    longitude: float
     distance_from_point: float
     distance_from_start: Optional[float] = None
     segment_index: Optional[int] = None
     gallons: Optional[float] = None
     cost: Optional[float] = None
     distance_from_route: Optional[float] = None
+
+    @property
+    def coordinates(self):
+        return Coordinate(self.latitude, self.longitude)
 
     @property
     def as_dict(self):

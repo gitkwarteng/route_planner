@@ -1,5 +1,6 @@
 import enum
-
+import hashlib
+from django.core.cache import cache
 from routing.data import Coordinate
 
 
@@ -38,5 +39,15 @@ class GeoLocationService:
             raise ValueError(f"Invalid service type: {self.service_type}")
 
     def geocode(self, location:str) -> Coordinate:
+        cache_key = f"geocode:{hashlib.md5(location.encode()).hexdigest()}"
+        cached = cache.get(cache_key)
+        
+        if cached:
+            return Coordinate(**cached)
+        
         result = self.geocoder.geocode(location)
-        return Coordinate(latitude=result.latitude, longitude=result.longitude) if result else None
+        if result:
+            coord = Coordinate(latitude=result.latitude, longitude=result.longitude)
+            cache.set(cache_key, {'latitude': coord.latitude, 'longitude': coord.longitude}, timeout=86400)
+            return coord
+        return None

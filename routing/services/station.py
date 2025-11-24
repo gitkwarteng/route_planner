@@ -1,11 +1,13 @@
+import hashlib
 from typing import List, Dict, Optional
+from django.core.cache import cache
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
 from geopy.distance import geodesic
 
 from routing.models import FuelStation
-from routing.data import Coordinate, FuelStation, SamplePoint
+from routing.data import Coordinate, FuelStop, SamplePoint
 
 
 class StationService:
@@ -62,11 +64,15 @@ class StationService:
 
 
     @staticmethod
-    def find_nearby_stops_for_point(*, lat: float, lon: float, max_distance: float = 25) -> List[FuelStation]:
+    def find_nearby_stops_for_point(*, lat: float, lon: float, max_distance: float = 25) -> List[FuelStop]:
         """Find truck stops within radius of a point."""
+        cache_key = f"stops:{hashlib.md5(f'{lat},{lon},{max_distance}'.encode()).hexdigest()}"
+        cached = cache.get(cache_key)
+        if cached:
+            return [FuelStop(**s) for s in cached]
 
         nearby = []
-        ref_point = Point(lat, lon)
+        ref_point = Point(lon, lat)
 
         stations = FuelStation.objects.filter(
             distance_lte=(ref_point, D(mi=max_distance))
@@ -75,7 +81,7 @@ class StationService:
         ).order_by('price')[:20]
 
         for station in stations:
-            nearby.append(FuelStation(
+            nearby.append(FuelStop(
                 id=station.opis_id,
                 name=station.name,
                 address=station.address,
@@ -83,14 +89,17 @@ class StationService:
                 state=station.state,
                 price=float(station.price),
                 location=f"{station.city}, {station.state}, USA",
-                coords=Coordinate(station.location.y, station.location.x),
+                latitude=station.location.y,
+                longitude=station.location.x,
                 distance_from_point=station.distance.mi
             ))
 
-        return sorted(nearby, key=lambda x: x.price)
+        result = sorted(nearby, key=lambda x: x.price)
+        cache.set(cache_key, [s.as_dict for s in result], timeout=3600)
+        return result
 
     @staticmethod
-    def index_stops_by_segment_for_route(with_points: List[SamplePoint]) -> Dict[int, List[FuelStation]]:
+    def index_stops_by_segment_for_route(with_points: List[SamplePoint]) -> Dict[int, List[FuelStop]]:
         """Pre-compute stops near each route segment for efficiency."""
         stops_by_segment = {}
 
@@ -105,12 +114,13 @@ class StationService:
 
 
     @staticmethod
-    def find_best_stop_in_range(*,
-            stops_by_segment: Dict[int, List[FuelStation]],
-            start_distance: float,
-            max_distance: float,
-            total_distance: float
-    ) -> Optional[FuelStation]:
+    def find_best_stop_in_range(
+        *,
+        stops_by_segment: Dict[int, List[FuelStop]],
+        start_distance: float,
+        max_distance: float,
+        total_distance: float
+    ) -> Optional[FuelStop]:
         """Find the cheapest stop within the driveable range."""
         candidates = []
 
