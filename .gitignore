@@ -1,0 +1,7 @@
+*.pyc
+__pycache__/
+db.sqlite3
+stations_cache.json
+*.dat
+*.idx
+logs/
