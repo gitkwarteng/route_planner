@@ -6,12 +6,13 @@ RUN apt-get update && apt-get install -y \
     postgresql-client \
     gdal-bin \
     libgdal-dev \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY requirements/base.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements /app/requirements
+RUN pip install --no-cache-dir -r requirements/prod.txt
 
 COPY . /app/
 

@@ -1,6 +1,6 @@
 import dataclasses
 from collections import namedtuple
-from typing import List, Optional
+from typing import List, Optional, Any
 from math import radians, sin, cos, sqrt, atan2
 
 from geopy import Point
@@ -50,6 +50,7 @@ class RouteData:
     duration: float = None
     start: Coordinate = None
     finish: Coordinate = None
+    geometry: Any = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -75,7 +76,6 @@ class FuelStop:
     segment_index: Optional[int] = None
     gallons: Optional[float] = None
     cost: Optional[float] = None
-    distance_from_route: Optional[float] = None
 
     @property
     def coordinates(self):
@@ -96,6 +96,5 @@ class FuelStop:
             'distance_from_point': self.distance_from_point,
             'distance_from_start': self.distance_from_start,
             'gallons': self.gallons,
-            'cost': self.cost,
-            'distance_from_route': self.distance_from_route
+            'cost': self.cost
         }

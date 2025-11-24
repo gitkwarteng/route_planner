@@ -1,5 +1,4 @@
 from typing import List
-
 from routing.data import Coordinate, FuelStop, RouteData
 
 
@@ -15,11 +14,12 @@ def generate_map_url(*, start:Coordinate, end:Coordinate, stops:List[FuelStop]) 
         URL string
     """
     # Create markers string for uMap or similar
-    markers = [str(start)]
+    markers = [f"{start.latitude},{start.longitude}"]
 
     for stop in stops:
         markers.append(f"{stop.latitude},{stop.longitude}")
-    markers.append(str(end))
+
+    markers.append(f"{end.latitude},{end.longitude}")
 
     # Basic OSM link showing the route bounds
     min_lat = min(start.latitude, end.latitude, *[s.latitude for s in stops]) if stops else min(start.latitude, end.latitude)
@@ -30,7 +30,7 @@ def generate_map_url(*, start:Coordinate, end:Coordinate, stops:List[FuelStop]) 
     center_lat = (min_lat + max_lat) / 2
     center_lon = (min_lon + max_lon) / 2
 
-    return f"https://www.openstreetmap.org/?mlat={center_lat}&mlon={center_lon}#map=6/{center_lat}/{center_lon}"
+    return f"https://www.openstreetmap.org/?mlat={center_lat}&mlon={center_lon}#map=6/{center_lat}/{center_lon}/size=600x400"
 
 
 def make_response(*, route:RouteData, fuel_stops:List[FuelStop], total_cost:float, total_gallons:float, message=None):
@@ -41,6 +41,6 @@ def make_response(*, route:RouteData, fuel_stops:List[FuelStop], total_cost:floa
         'total_cost': total_cost,
         'total_gallons': total_gallons,
         'map': generate_map_url(start=route.start, end=route.finish, stops=fuel_stops),
-        # 'route': route.coordinates,
+        # 'route': route.geometry,
         'message': message
     }

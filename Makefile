@@ -33,3 +33,12 @@ shell:
 
 migrate:
 	docker exec routing-web-app python manage.py makemigrations && python manage.py migrate
+
+load-data:
+	docker exec routing-web-app python manage.py loaddata fuel_stations
+
+dump-data:
+	docker exec routing-web-app python manage.py dump_stations
+
+load-stations:
+	docker exec routing-web-app python manage.py load_stations fuel_stations.csv

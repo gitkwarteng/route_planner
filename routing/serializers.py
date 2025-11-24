@@ -4,8 +4,8 @@ from routing.utils.validation import is_valid_us_address
 
 
 class RouteRequestSerializer(serializers.Serializer):
-    start = serializers.CharField(required=True)
-    finish = serializers.CharField(required=True)
+    start = serializers.CharField(required=True, help_text='Starting location (e.g., "Los Angeles, CA")')
+    finish = serializers.CharField(required=True, help_text='Ending location (e.g., "San Francisco, CA")')
     
     def validate_start(self, value):
         if not is_valid_us_address(value):
@@ -27,7 +27,7 @@ class FuelStopSerializer(serializers.Serializer):
     gallons = serializers.FloatField()
     cost = serializers.FloatField()
     distance_from_start = serializers.FloatField()
-    distance_from_route = serializers.FloatField()
+    distance_from_point = serializers.FloatField()
 
 
 class RouteResponseSerializer(serializers.Serializer):

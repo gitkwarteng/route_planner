@@ -39,6 +39,7 @@ class RoutingClient(BaseRequestClient):
             route_data = RouteData(
                 distance=route['distance'] / 1609.34,  # Convert to miles
                 duration=route['duration'] / 60,  # Convert to minutes
+                # geometry=route['geometry'],
                 coordinates=[Coordinate(latitude=lat, longitude=lon) for lon, lat in route['geometry']['coordinates']],
                 start=from_location,
                 finish=to_location
