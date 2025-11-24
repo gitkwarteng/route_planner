@@ -7,5 +7,6 @@ logs/
 *.log
 .env
 venv/
+.venv/
 env/
 .DS_Store

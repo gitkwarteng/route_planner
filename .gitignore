@@ -5,3 +5,6 @@ stations_cache.json
 *.dat
 *.idx
 logs/
+.venv/
+.env
+data/postgres
