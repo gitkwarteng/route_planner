@@ -17,7 +17,7 @@ class RoutingClient(BaseRequestClient):
         :param to_location: The finish location for route.
         :return: Returns a route data if route was found, else None.
         """
-        coords = f"{from_location.__str__()};{to_location.__str__()}"
+        coords = f"{from_location.longitude},{from_location.latitude};{to_location.longitude},{to_location.latitude}"
         cache_key = f"route:{hashlib.md5(coords.encode()).hexdigest()}"
         
         cached = cache.get(cache_key)
@@ -39,7 +39,6 @@ class RoutingClient(BaseRequestClient):
             route_data = RouteData(
                 distance=route['distance'] / 1609.34,  # Convert to miles
                 duration=route['duration'] / 60,  # Convert to minutes
-                geometry=route['geometry'],
                 coordinates=[Coordinate(latitude=lat, longitude=lon) for lon, lat in route['geometry']['coordinates']],
                 start=from_location,
                 finish=to_location

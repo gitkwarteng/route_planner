@@ -36,11 +36,11 @@ def generate_map_url(*, start:Coordinate, end:Coordinate, stops:List[FuelStop]) 
 def make_response(*, route:RouteData, fuel_stops:List[FuelStop], total_cost:float, total_gallons:float, message=None):
     """Create a response dictionary for the API."""
     return {
-        'route': route.geometry,
         'total_distance': route.distance,
         'stops': [stop.as_dict for stop in fuel_stops],
         'total_cost': total_cost,
         'total_gallons': total_gallons,
         'map': generate_map_url(start=route.start, end=route.finish, stops=fuel_stops),
+        # 'route': route.coordinates,
         'message': message
     }

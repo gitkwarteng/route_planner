@@ -16,7 +16,7 @@ import os
 from django_settings.settings import DjangoSettings, DatabaseConfig, DjangoDatabases
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Database

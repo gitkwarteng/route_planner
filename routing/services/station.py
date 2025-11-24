@@ -4,6 +4,7 @@ from django.core.cache import cache
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
+# from django.contrib.gis.geos import GEOSGeometry
 from geopy.distance import geodesic
 
 from routing.models import FuelStation
@@ -28,7 +29,13 @@ class StationService:
         last_sample_distance = 0
 
         # Add starting point
-        points.append((with_coordinates[0].latitude, with_coordinates[0].longitude, 0))
+        points.append(
+            SamplePoint(
+                latitude=with_coordinates[0].latitude,
+                longitude=with_coordinates[0].longitude,
+                distance_from_start=0
+            )
+        )
 
         for i in range(1, len(with_coordinates)):
             prev = with_coordinates[i - 1]
@@ -45,9 +52,9 @@ class StationService:
                 last_sample_distance += at_intervals
                 # Interpolate position
                 ratio = (last_sample_distance - (cumulative_distance - segment_dist)) / segment_dist
-                lat = prev[1] + ratio * (curr[1] - prev[1])
-                lon = prev[0] + ratio * (curr[0] - prev[0])
-                points.append((lat, lon, last_sample_distance))
+                lat = prev.latitude + ratio * (curr.latitude - prev.latitude)
+                lon = prev.longitude + ratio * (curr.longitude - prev.longitude)
+
                 points.append(SamplePoint(
                     latitude=lat, longitude=lon,
                     distance_from_start=last_sample_distance
@@ -75,7 +82,7 @@ class StationService:
         ref_point = Point(lon, lat)
 
         stations = FuelStation.objects.filter(
-            distance_lte=(ref_point, D(mi=max_distance))
+            location__distance_lte=(ref_point, D(mi=max_distance))
         ).annotate(
             distance=Distance('location', ref_point)
         ).order_by('price')[:20]

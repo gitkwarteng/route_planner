@@ -47,7 +47,6 @@ class SamplePoint:
 class RouteData:
     coordinates: List[Coordinate]
     distance: float
-    geometry: List
     duration: float = None
     start: Coordinate = None
     finish: Coordinate = None
@@ -92,6 +91,8 @@ class FuelStop:
             'state': self.state,
             'price': self.price,
             'location': self.location,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
             'distance_from_point': self.distance_from_point,
             'distance_from_start': self.distance_from_start,
             'gallons': self.gallons,
