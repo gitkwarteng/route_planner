@@ -48,14 +48,14 @@ python manage.py runserver
 
 ### GET Request
 ```bash
-curl "http://localhost:8000/api/route/?start=Los%20Angeles,%20CA&end=Phoenix,%20AZ"
+curl "http://localhost:8000/api/route/plan/?start=Los%20Angeles,%20CA&finish=Phoenix,%20AZ"
 ```
 
 ### POST Request
 ```bash
-curl -X POST http://localhost:8000/api/route/ \
+curl -X POST http://localhost:8000/api/route/plan/ \
   -H "Content-Type: application/json" \
-  -d '{"start": "Los Angeles, CA", "end": "Phoenix, AZ"}'
+  -d '{"start": "Los Angeles, CA", "finish": "Phoenix, AZ"}'
 ```
 
 ## Response Format
@@ -84,7 +84,7 @@ curl -X POST http://localhost:8000/api/route/ \
 }
 ```
 
-* The `map` key is a base64 encoded html. It an be converted back to html in Javascript with 
+* The `map` key is a base64 encoded html. It can be converted back to html in Javascript with 
 ```js
     const html = atob(response.map);
 ```
