@@ -23,9 +23,9 @@ make down
 ### Manual Setup
 
 ```bash
-pip install -r requirements/base.txt
+pip install -r requirements/prod.txt
 python manage.py migrate
-python manage.py load_stations fuel_stations.csv
+python manage.py loaddata fuel_stations
 python manage.py runserver
 ```
 
