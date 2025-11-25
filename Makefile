@@ -41,4 +41,4 @@ dump-data:
 	docker exec routing-web-app python manage.py dump_stations
 
 load-stations:
-	docker exec routing-web-app python manage.py load_stations fuel_stations.csv
+	docker exec routing-web-app python manage.py load_stations
