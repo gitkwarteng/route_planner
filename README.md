@@ -102,7 +102,7 @@ curl -X POST http://localhost:8000/api/route/plan/ \
 
 ## Loading Fuel Stations
 
-1. Add stations to `fuel_stations.csv`:
+1. Add stations to `data/fuel-stations.csv`:
 ```
 OPIS Truckstop ID,Truckstop Name,Address,City,State,Rack ID,Retail Price
 ```
